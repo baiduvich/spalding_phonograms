@@ -6,10 +6,20 @@ class RatingService {
   static const _keyActionCount = 'rating_action_count';
   static const _keyCustomPromptShown = 'rating_custom_shown';
   static const _keyRatingCardDismissed = 'rating_card_dismissed';
+  static const _keyLastReviewRequestedMs = 'rating_last_requested_ms';
+  static const _keyReviewRequestCount = 'rating_request_count';
   static const _appStoreId = '6764657945';
 
+  // Cap native review prompts: max 2 total, at least 60 days apart.
+  static const _maxNativeRequests = 2;
+  static const _minDaysBetweenRequests = 60;
+
+  // Only trigger the native prompt at these milestone learned-counts.
+  static const _milestones = {5, 15, 40};
+
   /// Called when a phonogram is marked as Learned.
-  /// Shows custom love prompt on first action, fires requestReview on subsequent.
+  /// Shows custom love prompt exactly once (first action), then fires
+  /// requestReview only at milestone counts (5, 15, 40).
   static Future<void> onPrimaryActionCompleted(BuildContext? context) async {
     final prefs = await SharedPreferences.getInstance();
     final count = (prefs.getInt(_keyActionCount) ?? 0) + 1;
@@ -27,14 +37,7 @@ class RatingService {
       }
     }
 
-    await _fireRequestReview();
-  }
-
-  /// Called on HomeScreen init. Fires requestReview if user has completed at least one action.
-  static Future<void> onAppOpen() async {
-    final prefs = await SharedPreferences.getInstance();
-    final count = prefs.getInt(_keyActionCount) ?? 0;
-    if (count >= 1) {
+    if (_milestones.contains(count)) {
       await _fireRequestReview();
     }
   }
@@ -64,9 +67,23 @@ class RatingService {
   }
 
   static Future<void> _fireRequestReview() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final requestCount = prefs.getInt(_keyReviewRequestCount) ?? 0;
+    if (requestCount >= _maxNativeRequests) return;
+
+    final lastMs = prefs.getInt(_keyLastReviewRequestedMs) ?? 0;
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (lastMs > 0) {
+      final daysSinceLast = (now - lastMs) / (1000 * 60 * 60 * 24);
+      if (daysSinceLast < _minDaysBetweenRequests) return;
+    }
+
     final inAppReview = InAppReview.instance;
     if (await inAppReview.isAvailable()) {
       await inAppReview.requestReview();
+      await prefs.setInt(_keyLastReviewRequestedMs, now);
+      await prefs.setInt(_keyReviewRequestCount, requestCount + 1);
     }
   }
 
@@ -88,8 +105,6 @@ class RatingService {
       backgroundColor: theme.colorScheme.surface,
       isScrollControlled: true,
       useSafeArea: true,
-      // Cap width on iPad so the sheet doesn't stretch across the full screen;
-      // Flutter centres a constrained sheet horizontally.
       constraints: BoxConstraints(maxWidth: isWide ? 520 : double.infinity),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
