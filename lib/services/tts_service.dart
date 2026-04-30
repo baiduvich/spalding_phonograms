@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class TtsService {
@@ -10,8 +11,24 @@ class TtsService {
 
   Future<void> _init() async {
     if (_initialized) return;
+
+    if (Platform.isIOS) {
+      // Required on iOS: forces audio through the speaker even when mute switch is on
+      await _tts.setSharedInstance(true);
+      await _tts.setIosAudioCategory(
+        IosTextToSpeechAudioCategory.playback,
+        [
+          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+          IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+          IosTextToSpeechAudioCategoryOptions.defaultToSpeaker,
+        ],
+        IosTextToSpeechAudioMode.defaultMode,
+      );
+    }
+
     await _tts.setLanguage('en-US');
-    await _tts.setSpeechRate(0.45);
+    await _tts.setSpeechRate(0.42);
     await _tts.setVolume(1.0);
     await _tts.setPitch(1.0);
     _initialized = true;
