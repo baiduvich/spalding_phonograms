@@ -39,16 +39,17 @@ class _DrillScreenState extends State<DrillScreen>
 
   void _flipCard(String firstKeyword) {
     if (_isFlipped) {
+      debugPrint('[Drill] Flipping card back to front (card ${_currentIndex + 1})');
       _controller.reverse();
       setState(() {
         _isFlipped = false;
       });
     } else {
+      debugPrint('[Drill] Flipping card to back (card ${_currentIndex + 1}), speaking: "$firstKeyword"');
       _controller.forward();
       setState(() {
         _isFlipped = true;
       });
-      // Auto-speak when flipping to back
       if (firstKeyword.isNotEmpty) {
         TtsService().speak(firstKeyword);
       }
@@ -57,7 +58,9 @@ class _DrillScreenState extends State<DrillScreen>
 
   void _goNext(PhonogramProvider provider) {
     final total = provider.allPhonograms.length;
+    debugPrint('[Drill] Next — currently at ${_currentIndex + 1}/$total');
     if (_currentIndex + 1 >= total) {
+      debugPrint('[Drill] Reached end — recording session & showing completion');
       provider.recordDrillSession();
       _showCompletionDialog(provider);
     } else {
@@ -66,11 +69,13 @@ class _DrillScreenState extends State<DrillScreen>
         _isFlipped = false;
         _currentIndex++;
       });
+      debugPrint('[Drill] Advanced to card ${_currentIndex + 1}/$total');
     }
   }
 
   void _goPrev() {
     if (_currentIndex > 0) {
+      debugPrint('[Drill] Previous — going from ${_currentIndex + 1} to $_currentIndex');
       _controller.reset();
       setState(() {
         _isFlipped = false;

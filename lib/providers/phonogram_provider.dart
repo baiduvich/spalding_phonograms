@@ -21,6 +21,7 @@ class PhonogramProvider extends ChangeNotifier {
     _quizReversed = _prefs.getBool('quiz_reversed') ?? false;
     _drillStreak = _prefs.getInt('drill_streak') ?? 0;
     _lastDrillDate = _prefs.getString('last_drill_date') ?? '';
+    debugPrint('[Provider] Loaded — learned: ${_learnedIds.length}, streak: $_drillStreak, lastDrill: "$_lastDrillDate", quizReversed: $_quizReversed');
   }
 
   List<Phonogram> get allPhonograms => kPhonograms;
@@ -32,17 +33,20 @@ class PhonogramProvider extends ChangeNotifier {
   bool isLearned(int id) => _learnedIds.contains(id);
 
   void toggleLearned(int id) {
-    if (_learnedIds.contains(id)) {
+    final wasLearned = _learnedIds.contains(id);
+    if (wasLearned) {
       _learnedIds.remove(id);
     } else {
       _learnedIds.add(id);
     }
+    debugPrint('[Provider] toggleLearned(id=$id) — was: $wasLearned → now: ${!wasLearned} | total learned: ${_learnedIds.length}');
     _prefs.setStringList(
         'learned_ids', _learnedIds.map((e) => e.toString()).toList());
     notifyListeners();
   }
 
   void resetProgress() {
+    debugPrint('[Provider] resetProgress() — clearing ${_learnedIds.length} learned IDs + streak');
     _learnedIds.clear();
     _drillStreak = 0;
     _lastDrillDate = '';
@@ -53,6 +57,7 @@ class PhonogramProvider extends ChangeNotifier {
   }
 
   void setQuizReversed(bool value) {
+    debugPrint('[Provider] setQuizReversed($value)');
     _quizReversed = value;
     _prefs.setBool('quiz_reversed', value);
     notifyListeners();
@@ -62,8 +67,12 @@ class PhonogramProvider extends ChangeNotifier {
     final now = DateTime.now();
     final todayStr =
         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    debugPrint('[Provider] recordDrillSession() — today: $todayStr, lastDrill: "$_lastDrillDate", currentStreak: $_drillStreak');
 
-    if (_lastDrillDate == todayStr) return; // already counted today
+    if (_lastDrillDate == todayStr) {
+      debugPrint('[Provider] Already drilled today — streak unchanged');
+      return;
+    }
 
     final yesterday = now.subtract(const Duration(days: 1));
     final yesterdayStr =
@@ -71,8 +80,10 @@ class PhonogramProvider extends ChangeNotifier {
 
     if (_lastDrillDate == yesterdayStr) {
       _drillStreak += 1;
+      debugPrint('[Provider] Consecutive day — streak incremented to $_drillStreak');
     } else {
       _drillStreak = 1;
+      debugPrint('[Provider] Streak broken (last was "$_lastDrillDate") — reset to 1');
     }
 
     _lastDrillDate = todayStr;
