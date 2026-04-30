@@ -68,9 +68,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showResetDialog(PhonogramProvider provider) {
+    final outerContext = context;
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: outerContext,
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: AppTheme.surface,
         title: const Text(
           'Reset Progress',
@@ -82,7 +83,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text(
               'Cancel',
               style: TextStyle(color: AppTheme.textSecondary),
@@ -91,8 +92,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           TextButton(
             onPressed: () {
               provider.resetProgress();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
+              Navigator.pop(dialogContext);
+              ScaffoldMessenger.of(outerContext).showSnackBar(
                 const SnackBar(content: Text('Progress reset.')),
               );
             },

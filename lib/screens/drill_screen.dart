@@ -205,9 +205,8 @@ class _DrillScreenState extends State<DrillScreen>
                     ),
                   ),
                   const SizedBox(height: AppTheme.md),
-                  // Card takes ~55% of screen height
+                  // Card fills all remaining space
                   Expanded(
-                    flex: 55,
                     child: GestureDetector(
                       onTap: () => _flipCard(firstKeyword),
                       child: AnimatedBuilder(
@@ -238,64 +237,56 @@ class _DrillScreenState extends State<DrillScreen>
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 45,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: AppTheme.lg),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: SizedBox(
-                                height: 48,
-                                child: OutlinedButton(
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color: AppTheme.surfaceAlt),
-                                    foregroundColor: AppTheme.textPrimary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          AppTheme.radiusMd),
-                                    ),
-                                  ),
-                                  onPressed:
-                                      _currentIndex > 0 ? _goPrev : null,
-                                  child: const Text(
-                                    '← Previous',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
+                  const SizedBox(height: AppTheme.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(
+                                  color: AppTheme.surfaceAlt),
+                              foregroundColor: AppTheme.textPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusMd),
                               ),
                             ),
-                            const SizedBox(width: AppTheme.sm),
-                            Expanded(
-                              child: SizedBox(
-                                height: 48,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppTheme.primary,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                          AppTheme.radiusMd),
-                                    ),
-                                  ),
-                                  onPressed: () => _goNext(provider),
-                                  child: const Text(
-                                    'Next →',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ),
-                              ),
+                            onPressed: _currentIndex > 0 ? _goPrev : null,
+                            child: const Text(
+                              '← Previous',
+                              style:
+                                  TextStyle(fontWeight: FontWeight.w600),
                             ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: AppTheme.sm),
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                    AppTheme.radiusMd),
+                              ),
+                            ),
+                            onPressed: () => _goNext(provider),
+                            child: const Text(
+                              'Next →',
+                              style:
+                                  TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(height: AppTheme.md),
                 ],
               ),
             ),
@@ -367,7 +358,12 @@ class _DrillScreenState extends State<DrillScreen>
             ),
           ),
           SingleChildScrollView(
-            padding: const EdgeInsets.all(AppTheme.lg),
+            padding: const EdgeInsets.only(
+              top: 52,
+              left: AppTheme.lg,
+              right: AppTheme.lg,
+              bottom: AppTheme.lg,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

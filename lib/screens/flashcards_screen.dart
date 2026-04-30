@@ -174,9 +174,10 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
               height: AppTheme.minTouchTarget,
               child: ElevatedButton(
                 onPressed: () {
+                  _controller.reset();
                   setState(() {
+                    _isFlipped = false;
                     _currentIndex = 0;
-                    _resetFlip();
                   });
                 },
                 child: const Text('Restart'),
@@ -281,8 +282,9 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                       if (provider.isLearned(phonogram.id)) {
                         provider.toggleLearned(phonogram.id);
                       }
-                      _resetFlip();
+                      _controller.reset();
                       setState(() {
+                        _isFlipped = false;
                         _currentIndex = _currentIndex + 1;
                       });
                     },
@@ -310,8 +312,9 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                       if (!provider.isLearned(phonogram.id)) {
                         provider.toggleLearned(phonogram.id);
                       }
-                      _resetFlip();
+                      _controller.reset();
                       setState(() {
+                        _isFlipped = false;
                         _currentIndex = _currentIndex + 1;
                       });
                     },
@@ -373,7 +376,6 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(AppTheme.lg),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(

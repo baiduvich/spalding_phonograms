@@ -222,7 +222,7 @@ class _QuizScreenState extends State<QuizScreen> {
           const SizedBox(height: AppTheme.xl),
           Expanded(
             child: ListView.separated(
-              physics: const NeverScrollableScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               itemCount: question.options.length,
               separatorBuilder: (_, __) =>
                   const SizedBox(height: AppTheme.sm),
@@ -232,36 +232,41 @@ class _QuizScreenState extends State<QuizScreen> {
                 final isSelected = index == _selectedOption;
                 final bgColor = _buttonColor(index);
 
-                return SizedBox(
-                  height: AppTheme.minTouchTarget + 8,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: bgColor,
-                      foregroundColor: _answered && (isCorrect || isSelected)
-                          ? Colors.white
-                          : AppTheme.textPrimary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.radiusMd),
-                        side: BorderSide(
-                          color: _answered && isCorrect
-                              ? AppTheme.success
-                              : _answered && isSelected
-                                  ? AppTheme.danger
-                                  : AppTheme.surfaceAlt,
-                          width: 1,
-                        ),
+                return ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: bgColor,
+                    foregroundColor: _answered && (isCorrect || isSelected)
+                        ? Colors.white
+                        : AppTheme.textPrimary,
+                    minimumSize:
+                        const Size(double.infinity, AppTheme.minTouchTarget),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.md,
+                      vertical: AppTheme.sm,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.radiusMd),
+                      side: BorderSide(
+                        color: _answered && isCorrect
+                            ? AppTheme.success
+                            : _answered && isSelected
+                                ? AppTheme.danger
+                                : AppTheme.surfaceAlt,
+                        width: 1,
                       ),
                     ),
-                    onPressed: _answered ? null : () => _selectOption(index),
-                    child: Text(
-                      question.options[index],
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+                  ),
+                  onPressed: _answered ? null : () => _selectOption(index),
+                  child: Text(
+                    question.options[index],
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 );
               },
