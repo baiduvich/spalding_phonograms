@@ -56,14 +56,11 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
         _isFlipped = false;
       });
     } else {
-      debugPrint('[Flashcard] Flipping to back — phonogram: "${phonogram.letters}", speaking: "${phonogram.keywords.isNotEmpty ? phonogram.keywords.first : 'none'}"');
+      debugPrint('[Flashcard] Flipping to back — phonogram: "${phonogram.letters}"');
       _controller.forward();
       setState(() {
         _isFlipped = true;
       });
-      if (phonogram.keywords.isNotEmpty) {
-        TtsService().speak(phonogram.keywords.first);
-      }
     }
   }
 

@@ -37,22 +37,15 @@ class _DrillScreenState extends State<DrillScreen>
     super.dispose();
   }
 
-  void _flipCard(String firstKeyword) {
+  void _flipCard() {
     if (_isFlipped) {
       debugPrint('[Drill] Flipping card back to front (card ${_currentIndex + 1})');
       _controller.reverse();
-      setState(() {
-        _isFlipped = false;
-      });
+      setState(() => _isFlipped = false);
     } else {
-      debugPrint('[Drill] Flipping card to back (card ${_currentIndex + 1}), speaking: "$firstKeyword"');
+      debugPrint('[Drill] Flipping card to back (card ${_currentIndex + 1})');
       _controller.forward();
-      setState(() {
-        _isFlipped = true;
-      });
-      if (firstKeyword.isNotEmpty) {
-        TtsService().speak(firstKeyword);
-      }
+      setState(() => _isFlipped = true);
     }
   }
 
@@ -209,7 +202,7 @@ class _DrillScreenState extends State<DrillScreen>
                   // Card fills all remaining space
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => _flipCard(firstKeyword),
+                      onTap: _flipCard,
                       child: AnimatedBuilder(
                         animation: _animation,
                         builder: (context, child) {
