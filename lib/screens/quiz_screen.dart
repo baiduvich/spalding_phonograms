@@ -197,16 +197,20 @@ class _QuizScreenState extends State<QuizScreen> {
               minHeight: 4,
             ),
           ),
-          const SizedBox(height: AppTheme.xl),
-          Center(
-            child: Text(
-              question.questionText,
-              style: const TextStyle(
-                fontSize: 48,
-                fontWeight: FontWeight.w800,
-                color: AppTheme.textPrimary,
+          const SizedBox(height: AppTheme.lg),
+          SizedBox(
+            height: 80,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                question.questionText,
+                style: const TextStyle(
+                  fontSize: 48,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
           const SizedBox(height: AppTheme.xs),
@@ -219,7 +223,7 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
-          const SizedBox(height: AppTheme.xl),
+          const SizedBox(height: AppTheme.md),
           Expanded(
             child: ListView.separated(
               physics: const ClampingScrollPhysics(),

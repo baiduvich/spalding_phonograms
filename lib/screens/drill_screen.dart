@@ -55,22 +55,15 @@ class _DrillScreenState extends State<DrillScreen>
     }
   }
 
-  void _resetToFront() {
-    _controller.reset();
-    setState(() {
-      _isFlipped = false;
-    });
-  }
-
   void _goNext(PhonogramProvider provider) {
     final total = provider.allPhonograms.length;
     if (_currentIndex + 1 >= total) {
-      // Show completion
       provider.recordDrillSession();
       _showCompletionDialog(provider);
     } else {
-      _resetToFront();
+      _controller.reset();
       setState(() {
+        _isFlipped = false;
         _currentIndex++;
       });
     }
@@ -78,18 +71,20 @@ class _DrillScreenState extends State<DrillScreen>
 
   void _goPrev() {
     if (_currentIndex > 0) {
-      _resetToFront();
+      _controller.reset();
       setState(() {
+        _isFlipped = false;
         _currentIndex--;
       });
     }
   }
 
   void _showCompletionDialog(PhonogramProvider provider) {
+    final drillNav = Navigator.of(context);
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppTheme.surface,
           shape: RoundedRectangleBorder(
@@ -122,9 +117,10 @@ class _DrillScreenState extends State<DrillScreen>
                 height: AppTheme.minTouchTarget,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    _resetToFront();
+                    Navigator.of(dialogContext).pop();
+                    _controller.reset();
                     setState(() {
+                      _isFlipped = false;
                       _currentIndex = 0;
                     });
                   },
@@ -144,8 +140,8 @@ class _DrillScreenState extends State<DrillScreen>
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
+                    drillNav.pop();
                   },
                   child: const Text('Done'),
                 ),
