@@ -9,6 +9,7 @@ class PhonogramProvider extends ChangeNotifier {
   bool _quizReversed = false;
   int _drillStreak = 0;
   String _lastDrillDate = '';
+  int _resetVersion = 0;
 
   PhonogramProvider(this._prefs) {
     _load();
@@ -28,6 +29,7 @@ class PhonogramProvider extends ChangeNotifier {
   bool get quizReversed => _quizReversed;
   int get learnedCount => _learnedIds.length;
   int get drillStreak => _drillStreak;
+  int get resetVersion => _resetVersion;
 
   bool isLearned(int id) => _learnedIds.contains(id);
 
@@ -46,6 +48,7 @@ class PhonogramProvider extends ChangeNotifier {
     _learnedIds.clear();
     _drillStreak = 0;
     _lastDrillDate = '';
+    _resetVersion++;
     _prefs.setStringList('learned_ids', []);
     _prefs.setInt('drill_streak', 0);
     _prefs.setString('last_drill_date', '');

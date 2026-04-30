@@ -59,13 +59,6 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
     }
   }
 
-  void _resetFlip() {
-    _controller.reset();
-    setState(() {
-      _isFlipped = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<PhonogramProvider>(
@@ -78,10 +71,11 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
             actions: [
               TextButton(
                 onPressed: () {
+                  _controller.reset();
                   setState(() {
                     _showUnlearnedOnly = !_showUnlearnedOnly;
                     _currentIndex = 0;
-                    _resetFlip();
+                    _isFlipped = false;
                   });
                 },
                 child: Text(
@@ -272,11 +266,8 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                       ),
                     ),
                     onPressed: () {
-                      if (provider.isLearned(phonogram.id)) {
-                        provider.toggleLearned(phonogram.id);
-                      }
-                      _controller.reset();
                       final next = _currentIndex + 1;
+                      _controller.reset();
                       if (next >= deck.length) {
                         RatingService.onFlashcardDeckCompleted();
                       }

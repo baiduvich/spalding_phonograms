@@ -37,6 +37,9 @@ class _QuizScreenState extends State<QuizScreen> {
   static const int _quizLength = 20;
   final Random _random = Random();
 
+  bool? _lastQuizReversed;
+  int _lastResetVersion = -1;
+
   @override
   void initState() {
     super.initState();
@@ -143,6 +146,18 @@ class _QuizScreenState extends State<QuizScreen> {
   Widget build(BuildContext context) {
     return Consumer<PhonogramProvider>(
       builder: (context, provider, _) {
+        // Rebuild quiz when mode or progress resets
+        if (_lastQuizReversed != provider.quizReversed ||
+            _lastResetVersion != provider.resetVersion) {
+          _lastQuizReversed = provider.quizReversed;
+          _lastResetVersion = provider.resetVersion;
+          if (_questions.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) _buildQuiz();
+            });
+          }
+        }
+
         return Scaffold(
           appBar: AppBar(
             title: const Text('Quiz'),
