@@ -51,17 +51,11 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
 
   void _flipCard(Phonogram phonogram) {
     if (_isFlipped) {
-      debugPrint('[Flashcard] Flipping back to front — phonogram: "${phonogram.letters}"');
       _controller.reverse();
-      setState(() {
-        _isFlipped = false;
-      });
+      setState(() => _isFlipped = false);
     } else {
-      debugPrint('[Flashcard] Flipping to back — phonogram: "${phonogram.letters}"');
       _controller.forward();
-      setState(() {
-        _isFlipped = true;
-      });
+      setState(() => _isFlipped = true);
     }
   }
 

@@ -46,12 +46,10 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   void _buildQuiz() {
-    debugPrint('[Quiz] Building quiz...');
     final provider = context.read<PhonogramProvider>();
     final all = List<Phonogram>.from(provider.allPhonograms)..shuffle(_random);
     final selected = all.take(_quizLength).toList();
     final quizReversed = provider.quizReversed;
-    debugPrint('[Quiz] quizReversed=$quizReversed, selected ${selected.length} phonograms');
 
     final questions = selected.map((phonogram) {
       final String questionText;
@@ -95,7 +93,6 @@ class _QuizScreenState extends State<QuizScreen> {
     }).toList();
 
     if (!mounted) return;
-    debugPrint('[Quiz] Quiz built — ${questions.length} questions ready');
     setState(() {
       _questions = questions;
       _currentIndex = 0;
@@ -110,14 +107,12 @@ class _QuizScreenState extends State<QuizScreen> {
     if (_answered) return;
     final question = _questions[_currentIndex];
     final isCorrect = question.options[index] == question.correctAnswer;
-    debugPrint('[Quiz] Q${_currentIndex + 1}: selected="${question.options[index]}" correct="${question.correctAnswer}" isCorrect=$isCorrect');
 
     setState(() {
       _selectedOption = index;
       _answered = true;
       if (isCorrect) _score++;
     });
-    debugPrint('[Quiz] Score: $_score / ${_currentIndex + 1}');
 
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (!mounted) return;

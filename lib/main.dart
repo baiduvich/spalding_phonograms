@@ -12,10 +12,8 @@ import 'services/rating_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  debugPrint('[App] Starting Phonograms app...');
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   final prefs = await SharedPreferences.getInstance();
-  debugPrint('[App] SharedPreferences loaded');
   runApp(
     ChangeNotifierProvider(
       create: (_) => PhonogramProvider(prefs),
@@ -70,10 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          debugPrint('[Nav] Tab tapped: $index');
-          setState(() => _currentIndex = index);
-        },
+        onTap: (index) => setState(() => _currentIndex = index),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.grid_view_rounded),
