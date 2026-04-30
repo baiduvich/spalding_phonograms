@@ -190,24 +190,33 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
                             ),
                           ),
                         )
-                      : GridView.builder(
-                          padding: const EdgeInsets.all(AppTheme.sm),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            childAspectRatio: 1.0,
-                            crossAxisSpacing: AppTheme.sm,
-                            mainAxisSpacing: AppTheme.sm,
-                          ),
-                          itemCount: phonograms.length,
-                          itemBuilder: (context, index) {
-                            final phonogram = phonograms[index];
-                            final learned = provider.isLearned(phonogram.id);
-                            return _PhonogramCard(
-                              phonogram: phonogram,
-                              isLearned: learned,
-                              onTap: () =>
-                                  _showDetail(context, phonogram, provider),
+                      : LayoutBuilder(
+                          builder: (context, constraints) {
+                            // Scale columns with available width:
+                            // ~390pt iPhone → 3 cols, ~768pt iPad → 6 cols
+                            final cols =
+                                (constraints.maxWidth / 120).floor().clamp(3, 8);
+                            return GridView.builder(
+                              padding: const EdgeInsets.all(AppTheme.sm),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: cols,
+                                childAspectRatio: 1.0,
+                                crossAxisSpacing: AppTheme.sm,
+                                mainAxisSpacing: AppTheme.sm,
+                              ),
+                              itemCount: phonograms.length,
+                              itemBuilder: (context, index) {
+                                final phonogram = phonograms[index];
+                                final learned =
+                                    provider.isLearned(phonogram.id);
+                                return _PhonogramCard(
+                                  phonogram: phonogram,
+                                  isLearned: learned,
+                                  onTap: () => _showDetail(
+                                      context, phonogram, provider),
+                                );
+                              },
                             );
                           },
                         ),
@@ -221,9 +230,16 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
   }
 
   Widget _buildRatingCard() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth > 600;
+    final iconSize = isWide ? 48.0 : 38.0;
+    final iconInner = isWide ? 26.0 : 20.0;
+    final titleSize = isWide ? 15.0 : 13.0;
+    final bodySize = isWide ? 13.0 : 11.0;
+
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.md, vertical: AppTheme.sm),
+      padding: EdgeInsets.symmetric(
+          horizontal: AppTheme.md, vertical: isWide ? 12.0 : AppTheme.sm),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -239,24 +255,24 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
       child: Row(
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: iconSize,
+            height: iconSize,
             decoration: BoxDecoration(
               color: AppTheme.primary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.star_rounded,
-                color: AppTheme.primary, size: 20),
+            child: Icon(Icons.star_rounded,
+                color: AppTheme.primary, size: iconInner),
           ),
           const SizedBox(width: AppTheme.sm),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Enjoying Phonograms?',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: titleSize,
                     fontWeight: FontWeight.w700,
                     color: AppTheme.textPrimary,
                   ),
@@ -264,7 +280,7 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
                 Text(
                   'A quick rating helps other educators find us.',
                   style: TextStyle(
-                      fontSize: 11, color: AppTheme.textSecondary),
+                      fontSize: bodySize, color: AppTheme.textSecondary),
                 ),
               ],
             ),
@@ -277,10 +293,12 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
               minimumSize: Size.zero,
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
-            child: const Text(
+            child: Text(
               'Rate',
               style: TextStyle(
-                  color: AppTheme.primary, fontWeight: FontWeight.w700),
+                  fontSize: isWide ? 15.0 : 13.0,
+                  color: AppTheme.primary,
+                  fontWeight: FontWeight.w700),
             ),
           ),
           GestureDetector(
@@ -288,10 +306,11 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
               await RatingService.dismissRatingCard();
               if (mounted) setState(() => _showRatingCard = false);
             },
-            child: const Padding(
-              padding: EdgeInsets.all(4),
+            child: Padding(
+              padding: const EdgeInsets.all(4),
               child: Icon(Icons.close,
-                  size: 16, color: AppTheme.textSecondary),
+                  size: isWide ? 20.0 : 16.0,
+                  color: AppTheme.textSecondary),
             ),
           ),
         ],

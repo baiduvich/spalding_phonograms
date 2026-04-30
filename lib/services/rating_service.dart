@@ -72,15 +72,30 @@ class RatingService {
 
   static Future<void> _showCustomRatingPrompt(BuildContext context) async {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth > 600;
+    final hPad = isWide ? 40.0 : 24.0;
+    final iconSize = isWide ? 80.0 : 64.0;
+    final iconInner = isWide ? 40.0 : 32.0;
+    final titleSize = isWide ? 24.0 : 20.0;
+    final bodySize = isWide ? 16.0 : 14.0;
+    final starSize = isWide ? 40.0 : 32.0;
+    final btnHeight = isWide ? 56.0 : 52.0;
+    final btnFontSize = isWide ? 18.0 : 16.0;
 
     await showModalBottomSheet(
       context: context,
       backgroundColor: theme.colorScheme.surface,
+      isScrollControlled: true,
+      useSafeArea: true,
+      // Cap width on iPad so the sheet doesn't stretch across the full screen;
+      // Flutter centres a constrained sheet horizontally.
+      constraints: BoxConstraints(maxWidth: isWide ? 520 : double.infinity),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+        padding: EdgeInsets.fromLTRB(hPad, 20, hPad, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -94,8 +109,8 @@ class RatingService {
             ),
             const SizedBox(height: 20),
             Container(
-              width: 64,
-              height: 64,
+              width: iconSize,
+              height: iconSize,
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
@@ -103,7 +118,7 @@ class RatingService {
               child: Icon(
                 Icons.favorite,
                 color: theme.colorScheme.primary,
-                size: 32,
+                size: iconInner,
               ),
             ),
             const SizedBox(height: 16),
@@ -111,7 +126,7 @@ class RatingService {
               'You learned your first phonogram!',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: titleSize,
                 fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onSurface,
               ),
@@ -121,7 +136,7 @@ class RatingService {
               'If Phonograms is helping you teach, a quick rating helps other educators find us too.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: bodySize,
                 height: 1.5,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
@@ -132,16 +147,17 @@ class RatingService {
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
                 5,
-                (_) => const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 2),
-                  child: Icon(Icons.star_rounded, color: Colors.amber, size: 32),
+                (_) => Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: Icon(Icons.star_rounded,
+                      color: Colors.amber, size: starSize),
                 ),
               ),
             ),
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              height: 52,
+              height: btnHeight,
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pop(ctx);
@@ -155,9 +171,10 @@ class RatingService {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
+                child: Text(
                   'Rate Us',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      fontSize: btnFontSize, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -168,7 +185,7 @@ class RatingService {
                 'Not Now',
                 style: TextStyle(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                  fontSize: 14,
+                  fontSize: bodySize,
                 ),
               ),
             ),
