@@ -8,6 +8,7 @@ import 'screens/phonograms_screen.dart';
 import 'screens/flashcards_screen.dart';
 import 'screens/quiz_screen.dart';
 import 'screens/settings_screen.dart';
+import 'services/rating_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    RatingService.onAppOpen();
+  }
 
   final List<Widget> _screens = const [
     PhonogramsScreen(),

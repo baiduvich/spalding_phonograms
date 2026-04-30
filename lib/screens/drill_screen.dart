@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../providers/phonogram_provider.dart';
+import '../services/rating_service.dart';
 import '../services/tts_service.dart';
 
 class DrillScreen extends StatefulWidget {
@@ -55,6 +56,7 @@ class _DrillScreenState extends State<DrillScreen>
     if (_currentIndex + 1 >= total) {
       debugPrint('[Drill] Reached end — recording session & showing completion');
       provider.recordDrillSession();
+      RatingService.onDrillCompleted();
       _showCompletionDialog(provider);
     } else {
       _controller.reset();

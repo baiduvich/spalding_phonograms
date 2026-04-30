@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../models/phonogram.dart';
 import '../providers/phonogram_provider.dart';
+import '../services/rating_service.dart';
 
 class _Question {
   final Phonogram phonogram;
@@ -120,8 +121,10 @@ class _QuizScreenState extends State<QuizScreen> {
 
     Future.delayed(const Duration(milliseconds: 1200), () {
       if (!mounted) return;
+      final done = _currentIndex + 1 >= _questions.length;
+      if (done) RatingService.onQuizCompleted();
       setState(() {
-        if (_currentIndex + 1 >= _questions.length) {
+        if (done) {
           _quizDone = true;
         } else {
           _currentIndex++;

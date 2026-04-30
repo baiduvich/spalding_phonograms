@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../models/phonogram.dart';
 import '../providers/phonogram_provider.dart';
+import '../services/rating_service.dart';
 import '../services/tts_service.dart';
 
 class FlashcardsScreen extends StatefulWidget {
@@ -281,9 +282,13 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                         provider.toggleLearned(phonogram.id);
                       }
                       _controller.reset();
+                      final next = _currentIndex + 1;
+                      if (next >= deck.length) {
+                        RatingService.onFlashcardDeckCompleted();
+                      }
                       setState(() {
                         _isFlipped = false;
-                        _currentIndex = _currentIndex + 1;
+                        _currentIndex = next;
                       });
                     },
                     child: const Text(
@@ -310,10 +315,15 @@ class _FlashcardsScreenState extends State<FlashcardsScreen>
                       if (!provider.isLearned(phonogram.id)) {
                         provider.toggleLearned(phonogram.id);
                       }
+                      RatingService.onPrimaryActionCompleted(context);
                       _controller.reset();
+                      final next = _currentIndex + 1;
+                      if (next >= deck.length) {
+                        RatingService.onFlashcardDeckCompleted();
+                      }
                       setState(() {
                         _isFlipped = false;
-                        _currentIndex = _currentIndex + 1;
+                        _currentIndex = next;
                       });
                     },
                     child: const Text(

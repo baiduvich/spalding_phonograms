@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../core/theme.dart';
 import '../models/phonogram.dart';
 import '../providers/phonogram_provider.dart';
+import '../services/rating_service.dart';
 import '../services/tts_service.dart';
 import 'drill_screen.dart';
 
@@ -16,6 +17,18 @@ class PhonogramsScreen extends StatefulWidget {
 class _PhonogramsScreenState extends State<PhonogramsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _query = '';
+  bool _showRatingCard = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRatingCard();
+  }
+
+  Future<void> _checkRatingCard() async {
+    final show = await RatingService.shouldShowRatingCard();
+    if (mounted) setState(() => _showRatingCard = show);
+  }
 
   @override
   void dispose() {
@@ -158,6 +171,13 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
                     ),
                   ),
                 ),
+                // Rating card
+                if (_showRatingCard)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                        AppTheme.md, AppTheme.sm, AppTheme.md, 0),
+                    child: _buildRatingCard(),
+                  ),
                 // Grid or empty state
                 Expanded(
                   child: phonograms.isEmpty
@@ -200,13 +220,92 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
     );
   }
 
+  Widget _buildRatingCard() {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppTheme.md, vertical: AppTheme.sm),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppTheme.primary.withValues(alpha: 0.18),
+            AppTheme.primary.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(AppTheme.radiusMd),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: AppTheme.primary.withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.star_rounded,
+                color: AppTheme.primary, size: 20),
+          ),
+          const SizedBox(width: AppTheme.sm),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Enjoying Phonograms?',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textPrimary,
+                  ),
+                ),
+                Text(
+                  'A quick rating helps other educators find us.',
+                  style: TextStyle(
+                      fontSize: 11, color: AppTheme.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => RatingService.openAppStoreListing(),
+            style: TextButton.styleFrom(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: const Text(
+              'Rate',
+              style: TextStyle(
+                  color: AppTheme.primary, fontWeight: FontWeight.w700),
+            ),
+          ),
+          GestureDetector(
+            onTap: () async {
+              await RatingService.dismissRatingCard();
+              if (mounted) setState(() => _showRatingCard = false);
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(4),
+              child: Icon(Icons.close,
+                  size: 16, color: AppTheme.textSecondary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showDetail(
-    BuildContext context,
+    BuildContext screenContext,
     Phonogram phonogram,
     PhonogramProvider provider,
   ) {
     showModalBottomSheet(
-      context: context,
+      context: screenContext,
       isScrollControlled: true,
       backgroundColor: AppTheme.surface,
       shape: const RoundedRectangleBorder(
@@ -368,8 +467,19 @@ class _PhonogramsScreenState extends State<PhonogramsScreen> {
                               : AppTheme.primary,
                           foregroundColor: AppTheme.textPrimary,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
+                          final wasLearned = prov.isLearned(phonogram.id);
                           prov.toggleLearned(phonogram.id);
+                          if (!wasLearned) {
+                            // Marking as learned — fire rating touchpoint
+                            RatingService.onPrimaryActionCompleted(
+                                screenContext);
+                            final show =
+                                await RatingService.shouldShowRatingCard();
+                            if (mounted) {
+                              setState(() => _showRatingCard = show);
+                            }
+                          }
                         },
                         child: Text(
                           isLearned ? 'Mark as Unlearned' : 'Mark as Learned',
