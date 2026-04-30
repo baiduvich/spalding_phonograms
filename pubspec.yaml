@@ -2,7 +2,7 @@ name: spalding_phonograms
 description: "A study app for all 70 Spalding phonograms."
 publish_to: 'none'
 
-version: 1.0.1+3
+version: 1.0.1+4
 
 environment:
   sdk: ^3.9.2
